@@ -27,13 +27,12 @@ if len(sys.argv) < 2:
 
 match sys.argv[1]:
     case 'init':
+        state = read_state()
         network = NeuralNetwork()
 
-        write_state(network.get_state())
+        print(network.get_best_guess())
 
-        state = read_state()
-        isinstance(state, NetworkState)
-        network.set_state(state)
+        write_state(network.get_state())
 
     case 'train':
         pass

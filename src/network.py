@@ -1,9 +1,14 @@
 import numpy as np
 
-INTERMEDIATE_LAYER_SIZES = [16, 16]
-
 Weights = np.ndarray[np.ndarray[float]]
 Biases = np.ndarray[float]
+
+INPUT_COUNT = 28 * 28
+INTERMEDIATE_LAYER_SIZES = [
+    16,  # First intermediate layer
+    16,  # Second intermediate layer
+    10  # Output layer
+]
 
 
 class NetworkState:
@@ -20,27 +25,42 @@ class NeuralNetwork:
     layers: list[np.ndarray[float]]
     weights: list[Weights]
     biases: list[Biases]
-    outputs: np.ndarray[float]
 
-    def __init__(self):
-        self.inputs = np.random.rand(28 * 28)
-        self.layers = []
+    def __init__(self, state: NetworkState | None = None):
+        # Create initial layer
+        self.inputs = np.empty(INPUT_COUNT)
+        self.layers = [self.inputs]
         self.weights = []
-        self.biases = []
+        self.biases = [np.empty(len(self.inputs))]
 
+        # Set input values to 0 to avoid nan errors
+        self.inputs.fill(0)
+        self.biases[0].fill(0)
+
+        # Create intermediate layers and output layer
         previous_layer_size = len(self.inputs)
         for layer_size in INTERMEDIATE_LAYER_SIZES:
-            self.layers.append(np.random.rand(layer_size))
+            # Add layer
+            layer = np.empty(layer_size)
+            layer.fill(0)
+            self.layers.append(layer)
+
+            # Add weights for incoming edges
             self.weights.append(np.random.rand(previous_layer_size, layer_size))
+
+            # Add biases for layer
             self.biases.append(np.random.rand(layer_size))
+
             previous_layer_size = layer_size
 
-        self.layers.append(np.random.rand(10))
-        self.weights.append(np.random.rand(previous_layer_size, 10))
-        self.biases.append(np.random.rand(10))
-        self.outputs = self.layers[len(self.layers) - 1]
+        if isinstance(state, NetworkState):
+            self.set_state(state)
+
+    def get_state(self) -> NetworkState:
+        return NetworkState(self.weights, self.biases)
 
     def set_state(self, state: NetworkState) -> None:
+        # Check state validity
         if len(self.weights) != len(state.weights):
             raise RuntimeError('Invalid state')
 
@@ -59,8 +79,13 @@ class NeuralNetwork:
             if len(self.biases[layer]) != len(state.biases[layer]):
                 raise RuntimeError('Invalid state')
 
+        # State is valid, overwrite weights and biases
         self.weights = state.weights
         self.biases = state.biases
 
-    def get_state(self) -> NetworkState:
-        return NetworkState(self.weights, self.biases)
+    def set_input(self, inputs: np.ndarray[float]):
+        self.inputs = inputs
+        pass
+
+    def get_best_guess(self):
+        return self.layers[-1].argmax()
