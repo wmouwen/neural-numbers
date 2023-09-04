@@ -11,7 +11,7 @@ Neural Network - Number Recognizition
 Pass a command as first argument to determine the script's behavior.
 
     load_data
-        Download test dataset from the internet
+        Download test dataset from the internet.
 
     init
         Create the cache directory, initiate a random starting state.
@@ -19,8 +19,8 @@ Pass a command as first argument to determine the script's behavior.
     train
         Train the neural network.
 
-    guess
-        Use the neural network to analyse a given input.
+    test
+        Test the neural network against a different dataset.
 """
 
 
