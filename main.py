@@ -6,7 +6,7 @@ from src.network import NeuralNetwork
 
 def usage():
     return """
-Neural Network - Number Recognizition
+Neural Network - Number Recognition
 
 Pass a command as first argument to determine the script's behavior.
 

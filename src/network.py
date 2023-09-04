@@ -83,7 +83,8 @@ class NeuralNetwork:
         pass
 
     def run(self):
-        pass
+        for index in range(1, len(self.layers)):
+            self.layers[index] = self.biases[index]
 
     def get_best_guess(self):
         return self.layers[-1].argmax()
