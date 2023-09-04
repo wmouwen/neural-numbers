@@ -10,6 +10,7 @@ INTERMEDIATE_LAYER_SIZES = [
     16,  # Second intermediate layer
     10  # Output layer
 ]
+BIAS_SIZE = 10
 
 
 class NetworkState:
@@ -22,20 +23,18 @@ class NetworkState:
 
 
 class NeuralNetwork:
-    inputs: Layer
     layers: list[Layer]
     weights: list[Weights]
     biases: list[Biases]
 
     def __init__(self, state: NetworkState | None = None):
         # Create initial layer
-        self.inputs = np.zeros(INPUT_COUNT)
-        self.layers = [self.inputs]
+        self.layers = [np.zeros(INPUT_COUNT)]
         self.weights = []
-        self.biases = [np.zeros(len(self.inputs))]
+        self.biases = [np.zeros(len(self.layers[0]))]
 
         # Create intermediate layers and output layer
-        previous_layer_size = len(self.inputs)
+        previous_layer_size = len(self.layers[0])
         for layer_size in INTERMEDIATE_LAYER_SIZES:
             # Add layer
             self.layers.append(np.zeros(layer_size))
@@ -44,7 +43,7 @@ class NeuralNetwork:
             self.weights.append(np.asmatrix(np.random.rand(previous_layer_size, layer_size)))
 
             # Add biases for layer
-            self.biases.append(np.random.rand(layer_size))
+            self.biases.append(-1 * BIAS_SIZE * np.random.rand(layer_size))
 
             previous_layer_size = layer_size
 
@@ -79,12 +78,24 @@ class NeuralNetwork:
         self.biases = state.biases
 
     def set_input(self, inputs: Layer):
-        self.inputs = inputs
+        self.layers[0] = inputs
         pass
 
     def run(self):
         for index in range(1, len(self.layers)):
-            self.layers[index] = self.biases[index]
+            signals = self.layers[index - 1]
+            weights = self.weights[index - 1]
+            biases = self.biases[index]
+
+            absolute_layer = weights.transpose().dot(signals) + biases
+            sigmoid_layer = 1 / (1 + np.exp(-1 * absolute_layer))
+
+            self.layers[index] = np.squeeze(np.asarray(sigmoid_layer))
+
+    def cost(self, correct_answer: int):
+        tmp = np.copy(self.layers[-1])
+        tmp[correct_answer] = 1.0 - tmp[correct_answer]
+        return np.sum(tmp * tmp)
 
     def get_best_guess(self):
         return self.layers[-1].argmax()

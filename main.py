@@ -53,11 +53,12 @@ match sys.argv[1]:
             network.set_input(image)
             network.run()
             guess = network.get_best_guess()
+            cost = network.cost(correct_answer)
 
             if guess == correct_answer:
-                print(f"Guess: {guess}, Answer: {correct_answer}")
+                print(f"Guess: {guess}, Answer: {correct_answer}, Cost: {round(cost, 3)}")
             else:
-                print(f"Guess: {guess}, Answer: {correct_answer} - Incorrect")
+                print(f"Guess: {guess}, Answer: {correct_answer}, Cost: {round(cost, 3)} - Incorrect")
 
         print(f"Done! n={len(images)}")
 
