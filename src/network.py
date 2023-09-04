@@ -1,6 +1,7 @@
 import numpy as np
 
-Weights = np.ndarray[np.ndarray[float]]
+Layer = np.ndarray[float]
+Weights = np.matrix[float]
 Biases = np.ndarray[float]
 
 INPUT_COUNT = 28 * 28
@@ -21,32 +22,26 @@ class NetworkState:
 
 
 class NeuralNetwork:
-    inputs: np.ndarray[float]
-    layers: list[np.ndarray[float]]
+    inputs: Layer
+    layers: list[Layer]
     weights: list[Weights]
     biases: list[Biases]
 
     def __init__(self, state: NetworkState | None = None):
         # Create initial layer
-        self.inputs = np.empty(INPUT_COUNT)
+        self.inputs = np.zeros(INPUT_COUNT)
         self.layers = [self.inputs]
         self.weights = []
-        self.biases = [np.empty(len(self.inputs))]
-
-        # Set input values to 0 to avoid nan errors
-        self.inputs.fill(0)
-        self.biases[0].fill(0)
+        self.biases = [np.zeros(len(self.inputs))]
 
         # Create intermediate layers and output layer
         previous_layer_size = len(self.inputs)
         for layer_size in INTERMEDIATE_LAYER_SIZES:
             # Add layer
-            layer = np.empty(layer_size)
-            layer.fill(0)
-            self.layers.append(layer)
+            self.layers.append(np.zeros(layer_size))
 
             # Add weights for incoming edges
-            self.weights.append(np.random.rand(previous_layer_size, layer_size))
+            self.weights.append(np.asmatrix(np.random.rand(previous_layer_size, layer_size)))
 
             # Add biases for layer
             self.biases.append(np.random.rand(layer_size))
@@ -83,8 +78,11 @@ class NeuralNetwork:
         self.weights = state.weights
         self.biases = state.biases
 
-    def set_input(self, inputs: np.ndarray[float]):
+    def set_input(self, inputs: Layer):
         self.inputs = inputs
+        pass
+
+    def run(self):
         pass
 
     def get_best_guess(self):
