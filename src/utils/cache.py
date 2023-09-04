@@ -1,30 +1,22 @@
 import os
-import pathlib
 import pickle
 
-CACHE_DIR = f"{pathlib.Path(__file__).parent.parent.parent}/.cache"
-STATE_FILE = "state"
-
-
-def create_cache_directory():
-    try:
-        os.makedirs(CACHE_DIR)
-    except FileExistsError:
-        # directory already exists
-        pass
+CACHE_DIR = os.path.join(os.getcwd(), '.cache')
+STATE_FILE = os.path.join(CACHE_DIR, 'state')
 
 
 def read_state():
-    create_cache_directory()
+    os.makedirs(CACHE_DIR, exist_ok=True)
 
-    if not os.path.exists(f"{CACHE_DIR}/{STATE_FILE}"):
+    if not os.path.exists(STATE_FILE):
         return None
 
-    with open(f"{CACHE_DIR}/{STATE_FILE}", 'rb') as filehandle:
+    with open(STATE_FILE, 'rb') as filehandle:
         return pickle.load(filehandle)
 
 
 def write_state(data):
-    create_cache_directory()
-    with open(f"{CACHE_DIR}/{STATE_FILE}", 'wb') as filehandle:
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+    with open(STATE_FILE, 'wb') as filehandle:
         pickle.dump(data, filehandle)
