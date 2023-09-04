@@ -60,6 +60,8 @@ match sys.argv[1]:
             else:
                 print(f"Guess: {guess}, Answer: {correct_answer}, Cost: {round(cost, 3)} - Incorrect")
 
+        cache.write_state(network.get_state())
+
         print(f"Done! n={len(images)}")
 
     case 'test':
