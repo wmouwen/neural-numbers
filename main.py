@@ -60,6 +60,11 @@ match sys.argv[1]:
             else:
                 print(f"Guess: {guess}, Answer: {correct_answer}, Cost: {round(cost, 3)} - Incorrect")
 
+            network.train_add_to_learnings(correct_answer)
+
+            if index % 1000 == 999:
+                network.train_propagate_learnings()
+
         cache.write_state(network.get_state())
 
         print(f"Done! n={len(images)}")

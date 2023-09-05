@@ -27,6 +27,10 @@ class NeuralNetwork:
     weights: list[Weights]
     biases: list[Biases]
 
+    train_runs: int
+    train_weights: list[Weights]
+    train_biases: list[Biases]
+
     def __init__(self, state: NetworkState | None = None):
         # Create initial layer
         self.layers = [np.zeros(INPUT_COUNT)]
@@ -49,6 +53,8 @@ class NeuralNetwork:
 
         if isinstance(state, NetworkState):
             self.set_state(state)
+
+        self.train_reset_learnings()
 
     def get_state(self) -> NetworkState:
         return NetworkState(self.weights, self.biases)
@@ -82,6 +88,8 @@ class NeuralNetwork:
         pass
 
     def run(self):
+        self.train_runs += 1
+
         for index in range(1, len(self.layers)):
             signals = self.layers[index - 1]
             weights = self.weights[index - 1]
@@ -92,10 +100,40 @@ class NeuralNetwork:
 
             self.layers[index] = np.squeeze(np.asarray(sigmoid_layer))
 
+    def get_best_guess(self):
+        return self.layers[-1].argmax()
+
     def cost(self, correct_answer: int):
         tmp = np.copy(self.layers[-1])
         tmp[correct_answer] = 1.0 - tmp[correct_answer]
         return np.sum(tmp * tmp)
 
-    def get_best_guess(self):
-        return self.layers[-1].argmax()
+    def train_reset_learnings(self):
+        self.train_runs = 0
+
+        self.train_weights = []
+        for weights in self.weights:
+            self.train_weights.append(weights.copy())
+            self.train_weights[-1].fill(0)
+
+        self.train_biases = []
+        for biases in self.biases:
+            self.train_biases.append(biases.copy())
+            self.train_biases[-1].fill(0)
+
+    def train_add_to_learnings(self, correct_answer: int):
+        # TODO
+
+        pass
+
+    def train_propagate_learnings(self):
+        if self.train_runs == 0:
+            return
+
+        for index in range(1, len(self.weights)):
+            self.weights[index] += self.train_weights[index] / self.train_runs
+
+        for index in range(1, len(self.biases)):
+            self.biases[index] += self.train_biases[index] / self.train_runs
+
+        self.train_reset_learnings()
