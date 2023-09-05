@@ -40,7 +40,7 @@ class NeuralNetwork:
             self.layers.append(np.zeros(layer_size))
 
             # Add weights for incoming edges
-            self.weights.append(np.asmatrix(np.random.rand(previous_layer_size, layer_size)))
+            self.weights.append(np.asmatrix(np.random.rand(layer_size, previous_layer_size)))
 
             # Add biases for layer
             self.biases.append(-1 * BIAS_SIZE * np.random.rand(layer_size))
@@ -87,7 +87,7 @@ class NeuralNetwork:
             weights = self.weights[index - 1]
             biases = self.biases[index]
 
-            absolute_layer = weights.transpose().dot(signals) + biases
+            absolute_layer = weights.dot(signals) + biases
             sigmoid_layer = 1 / (1 + np.exp(-1 * absolute_layer))
 
             self.layers[index] = np.squeeze(np.asarray(sigmoid_layer))
